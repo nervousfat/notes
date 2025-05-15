@@ -6,7 +6,7 @@
   "description": "本地笔记、搜索、标签和安全 Markdown 预览",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test core.test.js",
+    "test": "node --test",
     "check": "node --check core.js && node --check app.js && node --check server.mjs && node --check history.mjs",
     "history": "node history.mjs"
   },
