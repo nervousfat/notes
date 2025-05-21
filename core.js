@@ -10,3 +10,16 @@ export function normalizeTags(value) {
   return tags;
 }
 
+export function createNote(values = {}, now = new Date().toISOString()) {
+  const random = globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2);
+  return {
+    id: String(values.id || random),
+    title: String(values.title || '').trim().slice(0, 120) || '未命名笔记',
+    content: String(values.content || '').slice(0, 200000),
+    tags: normalizeTags(values.tags),
+    pinned: Boolean(values.pinned),
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
