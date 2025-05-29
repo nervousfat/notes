@@ -23,3 +23,16 @@ export function createNote(values = {}, now = new Date().toISOString()) {
   };
 }
 
+export function updateNote(note, patch, now = new Date().toISOString()) {
+  const next = { ...note, updatedAt: now };
+  if (Object.hasOwn(patch, 'title')) {
+    next.title = String(patch.title).trim().slice(0, 120) || '未命名笔记';
+  }
+  if (Object.hasOwn(patch, 'content')) {
+    next.content = String(patch.content).slice(0, 200000);
+  }
+  if (Object.hasOwn(patch, 'tags')) next.tags = normalizeTags(patch.tags);
+  if (Object.hasOwn(patch, 'pinned')) next.pinned = Boolean(patch.pinned);
+  return next;
+}
+
