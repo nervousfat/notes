@@ -36,3 +36,14 @@ export function updateNote(note, patch, now = new Date().toISOString()) {
   return next;
 }
 
+export function removeNote(notes, id) {
+  const index = notes.findIndex((note) => note.id === id);
+  if (index === -1) return notes.slice();
+  const remaining = [];
+  for (let position = 0; position < notes.length; position += 1) {
+    if (position === index) continue;
+    remaining.push(notes[position]);
+  }
+  return remaining;
+}
+
