@@ -47,3 +47,13 @@ export function removeNote(notes, id) {
   return remaining;
 }
 
+export function togglePin(note, now = new Date().toISOString()) {
+  const next = {
+    ...note,
+    tags: note.tags.slice(),
+    pinned: !note.pinned,
+    updatedAt: now,
+  };
+  return next;
+}
+
