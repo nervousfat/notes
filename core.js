@@ -1,3 +1,15 @@
+function nextRevisionTime(note, now) {
+  const current = Date.parse(now);
+  const created = Date.parse(note.createdAt);
+  const previous = Date.parse(note.updatedAt);
+  if (typeof now !== 'string' || !Number.isFinite(current) || new Date(current).toISOString() !== now || !Number.isFinite(created) || !Number.isFinite(previous)) {
+    throw new Error('修订时间必须为有效的标准 ISO 格式');
+  }
+  const timestamp = Math.max(current, created, previous + 1);
+  if (timestamp > 8_640_000_000_000_000) throw new Error('修订时间超出可表示范围');
+  return new Date(timestamp).toISOString();
+}
+
 export function normalizeTags(value) {
   const list = Array.isArray(value) ? value : String(value || '').split(/[,，]/);
   const tags = [];
@@ -24,7 +36,7 @@ export function createNote(values = {}, now = new Date().toISOString()) {
 }
 
 export function updateNote(note, patch, now = new Date().toISOString()) {
-  const next = { ...note, updatedAt: now };
+  const next = { ...note, updatedAt: nextRevisionTime(note, now) };
   if (Object.hasOwn(patch, 'title')) {
     next.title = String(patch.title).trim().slice(0, 120) || '未命名笔记';
   }
@@ -52,7 +64,7 @@ export function togglePin(note, now = new Date().toISOString()) {
     ...note,
     tags: note.tags.slice(),
     pinned: !note.pinned,
-    updatedAt: now,
+    updatedAt: nextRevisionTime(note, now),
   };
   return next;
 }
