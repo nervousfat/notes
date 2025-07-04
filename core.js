@@ -69,3 +69,14 @@ export function togglePin(note, now = new Date().toISOString()) {
   return next;
 }
 
+export function searchNotes(notes, query = '', options = {}) {
+  const tokens = String(query).trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+  const tag = String(options.tag || '').toLocaleLowerCase();
+  return notes.filter((note) => {
+    if (options.pinnedOnly && !note.pinned) return false;
+    if (tag && !note.tags.includes(tag)) return false;
+    const searchable = [note.title, note.content, ...note.tags].join(' ').toLocaleLowerCase();
+    return tokens.every((token) => searchable.includes(token));
+  });
+}
+
