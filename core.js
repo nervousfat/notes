@@ -80,3 +80,15 @@ export function searchNotes(notes, query = '', options = {}) {
   });
 }
 
+export function sortNotes(notes, mode = 'newest') {
+  return notes.slice().sort((left, right) => {
+    if (left.pinned !== right.pinned) return Number(right.pinned) - Number(left.pinned);
+    if (mode === 'title') {
+      return left.title.localeCompare(right.title, 'zh-CN');
+    }
+    const difference = Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
+    if (difference === 0) return left.id.localeCompare(right.id);
+    return mode === 'oldest' ? -difference : difference;
+  });
+}
+
