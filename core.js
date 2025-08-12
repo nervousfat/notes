@@ -92,3 +92,13 @@ export function sortNotes(notes, mode = 'newest') {
   });
 }
 
+export function countWords(content) {
+  const text = String(content || '');
+  const hanCharacters = text.match(/\p{Script=Han}/gu) || [];
+  const withoutHan = text.replace(/\p{Script=Han}/gu, ' ');
+  const otherWords = withoutHan.match(/[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu) || [];
+  const words = hanCharacters.length + otherWords.length;
+  const characters = Array.from(text).filter((character) => !/\s/u.test(character)).length;
+  return { words, characters };
+}
+
