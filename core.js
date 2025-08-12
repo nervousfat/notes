@@ -102,3 +102,16 @@ export function countWords(content) {
   return { words, characters };
 }
 
+export function notebookStats(notes) {
+  const tags = new Set();
+  let words = 0;
+  let characters = 0;
+  for (const note of notes) {
+    const counted = countWords(note.content);
+    words += counted.words;
+    characters += counted.characters;
+    note.tags.forEach((tag) => tags.add(tag));
+  }
+  return { notes: notes.length, pinned: notes.filter((note) => note.pinned).length, tags: tags.size, words, characters };
+}
+
