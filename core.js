@@ -115,3 +115,14 @@ export function notebookStats(notes) {
   return { notes: notes.length, pinned: notes.filter((note) => note.pinned).length, tags: tags.size, words, characters };
 }
 
+export function escapeHTML(value) {
+  const entities = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return String(value).replace(/[&<>"']/g, (character) => entities[character]);
+}
+
