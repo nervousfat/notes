@@ -126,3 +126,16 @@ export function escapeHTML(value) {
   return String(value).replace(/[&<>"']/g, (character) => entities[character]);
 }
 
+export function safeLink(value) {
+  const candidate = String(value).trim();
+  try {
+    const parsed = new URL(candidate);
+    if (!['https:', 'http:', 'mailto:'].includes(parsed.protocol)) return null;
+    if (parsed.protocol === 'mailto:' && !parsed.pathname) return null;
+    if (/[\u0000-\u0020]/.test(candidate)) return null;
+    return candidate;
+  } catch {
+    return null;
+  }
+}
+
