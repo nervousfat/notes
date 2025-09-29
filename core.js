@@ -139,3 +139,24 @@ export function safeLink(value) {
   }
 }
 
+export function renderInline(value) {
+  const source = String(value);
+  const pattern = /(`[^`\n]+`|\*\*[^*\n]+\*\*|\*[^*\n]+\*|\[[^\]\n]+\]\([^\s)]+\))/g;
+  let output = '';
+  let cursor = 0;
+  for (const match of source.matchAll(pattern)) {
+    output += escapeHTML(source.slice(cursor, match.index));
+    const token = match[0];
+    if (token.startsWith('`')) output += '<code>' + escapeHTML(token.slice(1, -1)) + '</code>';
+    else if (token.startsWith('**')) output += '<strong>' + escapeHTML(token.slice(2, -2)) + '</strong>';
+    else if (token.startsWith('*')) output += '<em>' + escapeHTML(token.slice(1, -1)) + '</em>';
+    else {
+      const link = /^\[([^\]]+)\]\((.+)\)$/.exec(token);
+      const href = safeLink(link[2]);
+      output += href ? '<a href="' + escapeHTML(href) + '" target="_blank" rel="noopener noreferrer">' + escapeHTML(link[1]) + '</a>' : escapeHTML(link[1]);
+    }
+    cursor = match.index + token.length;
+  }
+  return output + escapeHTML(source.slice(cursor));
+}
+
