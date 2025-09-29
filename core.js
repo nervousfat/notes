@@ -160,3 +160,35 @@ export function renderInline(value) {
   return output + escapeHTML(source.slice(cursor));
 }
 
+export function renderMarkdown(content) {
+  const lines = String(content).replace(/\r\n?/g, '\n').split('\n');
+  const blocks = [];
+  let code = null;
+  let listOpen = false;
+  const closeList = () => { if (listOpen) { blocks.push('</ul>'); listOpen = false; } };
+  for (const line of lines) {
+    if (/^```/.test(line)) {
+      closeList();
+      if (code === null) code = [];
+      else { blocks.push('<pre><code>' + escapeHTML(code.join('\n')) + '</code></pre>'); code = null; }
+      continue;
+    }
+    if (code !== null) { code.push(line); continue; }
+    const bullet = /^\s*[-*] (.+)$/.exec(line);
+    if (bullet) {
+      if (!listOpen) { blocks.push('<ul>'); listOpen = true; }
+      blocks.push('<li>' + renderInline(bullet[1]) + '</li>');
+      continue;
+    }
+    closeList();
+    const heading = /^(#{1,3})\s+(.+)$/.exec(line);
+    if (heading) blocks.push('<h' + heading[1].length + '>' + renderInline(heading[2]) + '</h' + heading[1].length + '>');
+    else if (/^>\s?/.test(line)) blocks.push('<blockquote>' + renderInline(line.replace(/^>\s?/, '')) + '</blockquote>');
+    else if (/^---+$/.test(line.trim())) blocks.push('<hr>');
+    else if (line.trim()) blocks.push('<p>' + renderInline(line) + '</p>');
+  }
+  closeList();
+  if (code !== null) blocks.push('<pre><code>' + escapeHTML(code.join('\n')) + '</code></pre>');
+  return blocks.join('\n');
+}
+
