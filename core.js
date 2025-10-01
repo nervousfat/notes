@@ -206,3 +206,15 @@ export function validateNote(value) {
   return { id: value.id, title: value.title.trim() || '未命名笔记', content: value.content, tags: normalizeTags(value.tags), pinned: value.pinned, createdAt: value.createdAt, updatedAt: value.updatedAt };
 }
 
+export function parseNotebook(raw) {
+  if (typeof raw !== 'string' || raw.length > 5000000) throw new Error('文件必须是小于 5 MB 的 JSON 文本');
+  let parsed;
+  try { parsed = JSON.parse(raw); } catch { throw new Error('JSON 格式无法识别'); }
+  if (!parsed || parsed.version !== 1 || !Array.isArray(parsed.notes)) throw new Error('不是支持的笔记备份格式');
+  if (parsed.notes.length > 1000) throw new Error('笔记数量不能超过 1000');
+  const notes = parsed.notes.map(validateNote);
+  const unique = new Set(notes.map((note) => note.id));
+  if (unique.size !== notes.length) throw new Error('备份中存在重复笔记编号');
+  return notes;
+}
+
