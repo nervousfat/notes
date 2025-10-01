@@ -192,3 +192,17 @@ export function renderMarkdown(content) {
   return blocks.join('\n');
 }
 
+export function validateNote(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('笔记必须是对象');
+  if (typeof value.id !== 'string' || !value.id.trim() || value.id.length > 128) throw new Error('笔记编号无效');
+  if (typeof value.title !== 'string' || value.title.length > 120) throw new Error('笔记标题无效');
+  if (typeof value.content !== 'string' || value.content.length > 200000) throw new Error('笔记内容无效或过长');
+  if (!Array.isArray(value.tags) || value.tags.length > 12 || value.tags.some((tag) => typeof tag !== 'string' || tag.length > 32)) throw new Error('笔记标签无效');
+  if (typeof value.pinned !== 'boolean') throw new Error('置顶状态无效');
+  if (typeof value.createdAt !== 'string' || !Number.isFinite(Date.parse(value.createdAt))) throw new Error('创建时间无效');
+  if (typeof value.updatedAt !== 'string' || !Number.isFinite(Date.parse(value.updatedAt))) throw new Error('更新时间无效');
+  if (new Date(value.createdAt).toISOString() !== value.createdAt || new Date(value.updatedAt).toISOString() !== value.updatedAt) throw new Error('时间必须为有效的标准 ISO 格式');
+  if (Date.parse(value.updatedAt) < Date.parse(value.createdAt)) throw new Error('更新时间不能早于创建时间');
+  return { id: value.id, title: value.title.trim() || '未命名笔记', content: value.content, tags: normalizeTags(value.tags), pinned: value.pinned, createdAt: value.createdAt, updatedAt: value.updatedAt };
+}
+
