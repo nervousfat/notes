@@ -218,3 +218,15 @@ export function parseNotebook(raw) {
   return notes;
 }
 
+export function serializeNotebook(notes, now = new Date().toISOString()) {
+  if (!Array.isArray(notes) || notes.length > 1000) throw new Error('笔记数量不能超过 1000');
+  const clean = notes.map(validateNote);
+  const serialized = JSON.stringify({
+    version: 1,
+    exportedAt: now,
+    notes: clean,
+  }, null, 2);
+  parseNotebook(serialized);
+  return serialized;
+}
+
