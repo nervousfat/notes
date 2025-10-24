@@ -1,3 +1,11 @@
+export const MAX_BACKUP_BYTES = 5_000_000;
+
+function assertBackupSize(raw) {
+  if (typeof raw !== 'string' || raw.length > MAX_BACKUP_BYTES || new TextEncoder().encode(raw).byteLength > MAX_BACKUP_BYTES) {
+    throw new Error('文件必须是最多 5 MB 的 JSON 文本（UTF-8 字节）');
+  }
+}
+
 function nextRevisionTime(note, now) {
   const current = Date.parse(now);
   const created = Date.parse(note.createdAt);
@@ -207,7 +215,7 @@ export function validateNote(value) {
 }
 
 export function parseNotebook(raw) {
-  if (typeof raw !== 'string' || raw.length > 5000000) throw new Error('文件必须是小于 5 MB 的 JSON 文本');
+  assertBackupSize(raw);
   let parsed;
   try { parsed = JSON.parse(raw); } catch { throw new Error('JSON 格式无法识别'); }
   if (!parsed || parsed.version !== 1 || !Array.isArray(parsed.notes)) throw new Error('不是支持的笔记备份格式');
