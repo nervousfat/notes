@@ -238,3 +238,16 @@ export function serializeNotebook(notes, now = new Date().toISOString()) {
   return serialized;
 }
 
+export function mergeNotes(existing, incoming) {
+  const merged = new Map(existing.map((note) => [note.id, validateNote(note)]));
+  for (const value of incoming) {
+    const note = validateNote(value);
+    const previous = merged.get(note.id);
+    if (!previous || Date.parse(note.updatedAt) > Date.parse(previous.updatedAt)) {
+      merged.set(note.id, note);
+    }
+  }
+  if (merged.size > 1000) throw new Error('合并后笔记数量超过 1000');
+  return [...merged.values()];
+}
+
