@@ -251,3 +251,14 @@ export function mergeNotes(existing, incoming) {
   return [...merged.values()];
 }
 
+export function exportMarkdown(note) {
+  const title = note.title.replace(/[\r\n]/g, ' ');
+  const tags = note.tags.length ? '\n标签：' + note.tags.join(' · ') + '\n' : '';
+  const content = '# ' + title + '\n' + tags + '\n' + note.content + '\n';
+  let basename = title.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '-').replace(/[. ]+$/g, '').slice(0, 80);
+  if (!basename) basename = 'note';
+  if (/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(basename)) basename = 'note-' + basename;
+  const filename = basename + '.md';
+  return { filename, content };
+}
+
