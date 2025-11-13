@@ -272,3 +272,15 @@ export function createSampleNotes() {
   return [welcome, second];
 }
 
+export function recoverNotebook(raw) {
+  if (raw === null || raw === undefined) {
+    return { notes: createSampleNotes(), error: null, fresh: true, raw: null };
+  }
+  try {
+    const notes = parseNotebook(raw);
+    return { notes, error: null, fresh: false, raw: null };
+  } catch (error) {
+    return { notes: [], error: error.message, fresh: false, raw };
+  }
+}
+
