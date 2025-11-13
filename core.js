@@ -262,3 +262,13 @@ export function exportMarkdown(note) {
   return { filename, content };
 }
 
+export function createSampleNotes() {
+  const now = new Date().toISOString();
+  const welcome = createNote({
+    id: 'sample-welcome', title: '给想法一个安静的地方', pinned: true, tags: ['开始', '灵感'],
+    content: '# 欢迎来到纸间\n这里是保存在本机浏览器的私人笔记本。\n\n- 写下突然出现的灵感\n- 用标签整理日常记录\n- 导出 JSON 备份，也可单独导出 Markdown\n\n> 先记录，再慢慢整理。\n\n支持 **粗体**、*斜体*、`代码` 和 [Markdown 指南](https://www.markdownguide.org/)。',
+  }, now);
+  const second = createNote({ id: 'sample-weekend', title: '周末的小计划', tags: ['生活'], content: '# 让周末慢一点\n- 逛一次书店\n- 做一顿喜欢的早餐\n- 在公园走三十分钟\n\n## 随手记\n把值得记住的小事写在这里。' }, now);
+  return [welcome, second];
+}
+
