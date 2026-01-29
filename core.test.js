@@ -16,3 +16,14 @@ test('new notes have stable defaults and bounded text', () => {
   assert.equal(note({ title: 'x'.repeat(150) }).title.length, 120);
 });
 
+test('tags normalize separators, duplicates and limits', () => {
+  assert.deepEqual(core.normalizeTags(' Work, work，生活, ,IDEAS '), ['work', '生活', 'ideas']);
+  assert.deepEqual(core.normalizeTags(undefined), []);
+  assert.deepEqual(core.normalizeTags([' A ', 'a', 'b']), ['a', 'b']);
+  const many = core.normalizeTags(Array.from({ length: 20 }, (_, index) => 'tag' + index));
+  assert.equal(many.length, 12);
+  assert.equal(many[0], 'tag0');
+  assert.equal(many[11], 'tag11');
+  assert.equal(core.normalizeTags(['a'.repeat(100)])[0].length, 32);
+});
+
