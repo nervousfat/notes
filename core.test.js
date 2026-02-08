@@ -27,3 +27,17 @@ test('tags normalize separators, duplicates and limits', () => {
   assert.equal(core.normalizeTags(['a'.repeat(100)])[0].length, 32);
 });
 
+test('edits and pins preserve identity without mutating input', () => {
+  const original = note({ tags: ['work'] });
+  const edited = core.updateNote(original, { title: ' 更新 ', content: 'new', tags: 'A,b' }, late);
+  assert.equal(edited.id, original.id);
+  assert.equal(edited.createdAt, early);
+  assert.equal(edited.updatedAt, late);
+  assert.equal(original.title, '第一篇');
+  assert.equal(edited.title, '更新');
+  assert.deepEqual(edited.tags, ['a', 'b']);
+  const pinned = core.togglePin(edited, late);
+  assert.equal(pinned.pinned, true);
+  assert.equal(edited.pinned, false);
+});
+
