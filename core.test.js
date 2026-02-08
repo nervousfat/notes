@@ -41,3 +41,14 @@ test('edits and pins preserve identity without mutating input', () => {
   assert.equal(edited.pinned, false);
 });
 
+test('deletion retains unrelated notes and tolerates absent identifiers', () => {
+  const first = note();
+  const second = note({ id: 'note-2' });
+  const collection = [first, second];
+  assert.deepEqual(core.removeNote(collection, 'note-1'), [second]);
+  assert.deepEqual(core.removeNote(collection, 'missing'), collection);
+  assert.notEqual(core.removeNote(collection, 'missing'), collection);
+  assert.equal(collection.length, 2);
+  assert.deepEqual(core.removeNote([], 'note-1'), []);
+});
+
