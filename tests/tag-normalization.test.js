@@ -14,3 +14,7 @@ test('normalizeTags caps the list and truncates long tags', () => {
   const long = 'y'.repeat(40);
   assert.deepEqual(core.normalizeTags([long, long.slice(0, 32)]), ['y'.repeat(32)]);
 });
+test('normalizeTags handles numeric and empty input safely', () => {
+  assert.deepEqual(core.normalizeTags(42), ['42']);
+  assert.deepEqual(core.normalizeTags(null), []);
+});
