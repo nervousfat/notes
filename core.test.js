@@ -52,3 +52,15 @@ test('deletion retains unrelated notes and tolerates absent identifiers', () => 
   assert.deepEqual(core.removeNote([], 'note-1'), []);
 });
 
+test('search combines full text tokens, tags and pinned filters', () => {
+  const first = note({ title: 'Reading', content: 'Deep work', tags: ['study'], pinned: true });
+  const second = note({ id: 'two', title: 'Work', content: 'shopping', tags: ['life'] });
+  const notes = [first, second];
+  assert.deepEqual(core.searchNotes(notes, 'READ study'), [first]);
+  assert.equal(core.searchNotes(notes, 'work').length, 2);
+  assert.deepEqual(core.searchNotes(notes, '', { tag: 'life' }), [second]);
+  assert.deepEqual(core.searchNotes(notes, '', { pinnedOnly: true }), [first]);
+  assert.deepEqual(core.searchNotes(notes, 'unknown'), []);
+  assert.equal(core.searchNotes(notes, '   ').length, 2);
+});
+
