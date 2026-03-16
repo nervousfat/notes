@@ -64,3 +64,15 @@ test('search combines full text tokens, tags and pinned filters', () => {
   assert.equal(core.searchNotes(notes, '   ').length, 2);
 });
 
+test('sorting prioritizes pins and supports newest oldest and title', () => {
+  const a = note({ id: 'a', title: 'A' }, early);
+  const b = note({ id: 'b', title: 'B' }, late);
+  const pinned = note({ id: 'p', title: 'Z', pinned: true }, early);
+  const notes = [a, pinned, b];
+  assert.deepEqual(core.sortNotes(notes).map((item) => item.id), ['p', 'b', 'a']);
+  assert.deepEqual(core.sortNotes(notes, 'oldest').map((item) => item.id), ['p', 'a', 'b']);
+  assert.deepEqual(core.sortNotes(notes, 'title').map((item) => item.id), ['p', 'a', 'b']);
+  assert.equal(notes[0].id, 'a');
+  assert.deepEqual(core.sortNotes([]), []);
+});
+
