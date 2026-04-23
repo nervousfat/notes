@@ -13,3 +13,8 @@ test('countWords treats Latin runs as single words', () => {
   assert.equal(stats.words, 2);
   assert.equal(stats.characters, 10);
 });
+test('countWords ignores whitespace between words', () => {
+  const stats = core.countWords('你好\n\t世界 end');
+  assert.equal(stats.words, 5);
+  assert.equal(stats.characters, 7);
+});
