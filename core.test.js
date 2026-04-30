@@ -76,3 +76,16 @@ test('sorting prioritizes pins and supports newest oldest and title', () => {
   assert.deepEqual(core.sortNotes([]), []);
 });
 
+test('word and notebook statistics count Chinese and Latin content', () => {
+  assert.deepEqual(core.countWords('Hello 世界'), { words: 3, characters: 7 });
+  assert.deepEqual(core.countWords(''), { words: 0, characters: 0 });
+  assert.equal(core.countWords("don't stop").words, 2);
+  const notes = [note({ tags: ['a', 'b'], pinned: true }), note({ id: 'two', tags: ['b'], content: 'next' })];
+  const stats = core.notebookStats(notes);
+  assert.equal(stats.notes, 2);
+  assert.equal(stats.pinned, 1);
+  assert.equal(stats.tags, 2);
+  assert.equal(stats.words, 4);
+  assert.equal(stats.characters, 11);
+});
+
