@@ -100,3 +100,15 @@ test('HTML escaping neutralizes markup attributes and inline code', () => {
   assert.equal(core.renderInline('plain & safe'), 'plain &amp; safe');
 });
 
+test('links allow explicit safe protocols and escape attributes', () => {
+  assert.equal(core.safeLink('https://example.com'), 'https://example.com');
+  assert.equal(core.safeLink('mailto:a@example.com'), 'mailto:a@example.com');
+  assert.equal(core.safeLink('javascript:alert(1)'), null);
+  assert.equal(core.safeLink('data:text/html,hi'), null);
+  assert.equal(core.safeLink('//example.com'), null);
+  assert.equal(core.safeLink('https://a.com/\nhi'), null);
+  assert.ok(!core.renderInline('[bad](javascript:alert)').includes('<a'));
+  assert.ok(core.renderInline('[good](https://example.com)').includes('rel="noopener noreferrer"'));
+  assert.ok(core.renderInline('[x](https://x.test/"onmouseover="a)').includes('&quot;'));
+});
+
