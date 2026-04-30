@@ -89,3 +89,14 @@ test('word and notebook statistics count Chinese and Latin content', () => {
   assert.equal(stats.characters, 11);
 });
 
+test('HTML escaping neutralizes markup attributes and inline code', () => {
+  assert.equal(core.escapeHTML('<img a="x">&'), '&lt;img a=&quot;x&quot;&gt;&amp;');
+  const output = core.renderMarkdown('<script>alert(1)</script>');
+  assert.ok(output.includes('&lt;script&gt;'));
+  assert.ok(!output.includes('<script>'));
+  assert.equal(core.renderInline('`<svg>`'), '<code>&lt;svg&gt;</code>');
+  assert.equal(core.renderInline('**<b>**'), '<strong>&lt;b&gt;</strong>');
+  assert.equal(core.renderInline('*fine*'), '<em>fine</em>');
+  assert.equal(core.renderInline('plain & safe'), 'plain &amp; safe');
+});
+
