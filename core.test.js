@@ -124,3 +124,17 @@ test('Markdown blocks produce headings lists quotations and safe fences', () => 
   assert.equal(core.renderMarkdown('```\nunclosed'), '<pre><code>unclosed</code></pre>');
 });
 
+test('malformed imports reject shapes oversized fields and duplicates', () => {
+  assert.throws(() => core.parseNotebook('{oops'), /JSON/);
+  assert.throws(() => core.parseNotebook('[]'), /格式/);
+  const wrap = (notes) => JSON.stringify({ version: 1, notes });
+  assert.throws(() => core.parseNotebook(wrap([note({ id: 'x' }), note({ id: 'x' })])), /重复/);
+  assert.throws(() => core.parseNotebook(wrap([{ ...note(), pinned: 'yes' }])), /置顶/);
+  assert.throws(() => core.parseNotebook(wrap([{ ...note(), updatedAt: 'no-date' }])), /时间/);
+  assert.throws(() => core.parseNotebook(wrap([{ ...note(), updatedAt: '2026-02-30T10:00:00.000Z' }])), /时间/);
+  assert.throws(() => core.parseNotebook(wrap([{ ...note(), updatedAt: '2024-06-01T10:00:00.000Z' }])), /早于/);
+  assert.throws(() => core.parseNotebook(wrap([{ ...note(), tags: ['a'.repeat(40)] }])), /标签/);
+  assert.throws(() => core.parseNotebook(wrap([{ ...note(), content: 'a'.repeat(200001) }])), /内容/);
+  assert.throws(() => core.parseNotebook(' '.repeat(5000001)), /5 MB/);
+});
+
