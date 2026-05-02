@@ -112,3 +112,15 @@ test('links allow explicit safe protocols and escape attributes', () => {
   assert.ok(core.renderInline('[x](https://x.test/"onmouseover="a)').includes('&quot;'));
 });
 
+test('Markdown blocks produce headings lists quotations and safe fences', () => {
+  const rendered = core.renderMarkdown('# Heading\n- one\n- two\n\n> quote\n---\n```js\n<img>\n```');
+  assert.ok(rendered.includes('<h1>Heading</h1>'));
+  assert.ok(rendered.includes('<ul>'));
+  assert.ok(rendered.includes('<li>two</li>'));
+  assert.ok(rendered.includes('</ul>'));
+  assert.ok(rendered.includes('<blockquote>quote</blockquote>'));
+  assert.ok(rendered.includes('<hr>'));
+  assert.ok(rendered.includes('<pre><code>&lt;img&gt;</code></pre>'));
+  assert.equal(core.renderMarkdown('```\nunclosed'), '<pre><code>unclosed</code></pre>');
+});
+
