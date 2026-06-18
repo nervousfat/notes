@@ -138,3 +138,16 @@ test('malformed imports reject shapes oversized fields and duplicates', () => {
   assert.throws(() => core.parseNotebook(' '.repeat(5000001)), /5 MB/);
 });
 
+test('backup round trips and Markdown filenames are portable', () => {
+  const original = note({ title: 'A/B:C', content: '# body', tags: ['work'] });
+  const encoded = core.serializeNotebook([original], late);
+  assert.deepEqual(core.parseNotebook(encoded), [original]);
+  assert.equal(JSON.parse(encoded).exportedAt, late);
+  assert.equal(core.exportMarkdown(original).filename, 'A-B-C.md');
+  assert.ok(core.exportMarkdown(original).content.includes('# A/B:C'));
+  assert.ok(core.exportMarkdown(original).content.includes('标签：work'));
+  assert.equal(core.exportMarkdown(note({ title: 'CON' })).filename, 'note-CON.md');
+  assert.equal(core.exportMarkdown(note({ title: 'CON.foo' })).filename, 'note-CON.foo.md');
+  assert.equal(core.exportMarkdown(note({ title: '...' })).filename, 'note.md');
+});
+
