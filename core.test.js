@@ -151,3 +151,15 @@ test('backup round trips and Markdown filenames are portable', () => {
   assert.equal(core.exportMarkdown(note({ title: '...' })).filename, 'note.md');
 });
 
+test('import merging keeps the newest version and adds new identifiers', () => {
+  const existing = note({ content: 'old' }, early);
+  const fresh = core.updateNote(existing, { content: 'new' }, late);
+  const second = note({ id: 'two' });
+  assert.deepEqual(core.mergeNotes([existing], [fresh, second]), [fresh, second]);
+  assert.deepEqual(core.mergeNotes([fresh], [existing]), [fresh]);
+  assert.equal(existing.content, 'old');
+  assert.deepEqual(core.mergeNotes([], [second]), [second]);
+  assert.deepEqual(core.mergeNotes([existing], []), [existing]);
+  assert.throws(() => core.mergeNotes([], [{ nope: true }]), /编号/);
+});
+
