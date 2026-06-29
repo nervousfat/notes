@@ -8,3 +8,11 @@ test('exportMarkdown strips filesystem-hostile characters', () => {
   assert.equal(result.filename, 'a-b-c-d-.md');
   assert.ok(result.content.startsWith('# a<b:c*d?\n'));
 });
+test('exportMarkdown guards Windows reserved names', () => {
+  const reserved = { title: 'CON', tags: [], content: 'x' };
+  assert.equal(core.exportMarkdown(reserved).filename, 'note-CON.md');
+  const empty = { title: '', tags: [], content: 'x' };
+  assert.equal(core.exportMarkdown(empty).filename, 'note.md');
+  const tagged = { title: 'N', tags: ['a', 'b'], content: 'x' };
+  assert.ok(core.exportMarkdown(tagged).content.includes('标签：a · b'));
+});
