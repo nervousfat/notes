@@ -163,3 +163,17 @@ test('import merging keeps the newest version and adds new identifiers', () => {
   assert.throws(() => core.mergeNotes([], [{ nope: true }]), /编号/);
 });
 
+test('recovery preserves corrupted text and does not reseed an empty notebook', () => {
+  const first = core.recoverNotebook(null);
+  assert.equal(first.fresh, true);
+  assert.ok(first.notes.length >= 2);
+  assert.equal(new Set(first.notes.map((item) => item.id)).size, first.notes.length);
+  const empty = core.recoverNotebook(core.serializeNotebook([]));
+  assert.deepEqual(empty.notes, []);
+  assert.equal(empty.fresh, false);
+  const corrupt = core.recoverNotebook('broken');
+  assert.equal(corrupt.raw, 'broken');
+  assert.deepEqual(corrupt.notes, []);
+  assert.ok(corrupt.error);
+});
+
