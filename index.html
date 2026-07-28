@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f5f1">
+  <meta name="description" content="纸间，本地 Markdown 笔记本。记录想法、整理标签、预览和备份笔记。">
+  <title>纸间 · 本地笔记本</title>
+  <link rel="stylesheet" href="./base.css">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div><p class="eyebrow">PAPERSPACE / YOUR PRIVATE NOTEBOOK</p><h1>纸间<span class="title-dot">.</span></h1><p class="muted">把灵感留下，让思绪有处安放。</p></div>
+      <div class="header-actions"><span class="privacy-chip">● 仅保存在此浏览器</span><button id="new-note" type="button">＋ 新建笔记</button></div>
+    </header>
+    <section class="stats-strip" aria-label="笔记统计">
+      <div><strong id="stat-notes">0</strong><span>篇笔记</span></div>
+      <div><strong id="stat-words">0</strong><span>字 / 词</span></div>
+      <div><strong id="stat-tags">0</strong><span>个标签</span></div>
+      <p class="muted">每一个想法，都值得被记住。</p>
+    </section>
+    <div id="recovery-panel" class="recovery-panel" hidden role="alert"><p id="recovery-message"></p><button id="download-recovery" class="secondary" type="button">下载原始数据</button><button id="reset-storage" class="danger" type="button">重新启用保存</button></div>
+    <section class="notebook-layout" aria-label="笔记本">
+      <aside class="note-sidebar card">
+        <div class="sidebar-head"><h2>全部笔记</h2><span id="result-count" class="badge">0</span></div>
+        <label class="sr-only" for="search">搜索标题、正文或标签</label><input id="search" type="search" placeholder="搜索你的想法…" autocomplete="off">
+        <div class="filter-row"><label class="sr-only" for="tag-filter">标签筛选</label><select id="tag-filter"><option value="">所有标签</option></select><label class="sr-only" for="sort-order">排序</label><select id="sort-order"><option value="newest">最近更新</option><option value="oldest">较早更新</option><option value="title">标题顺序</option></select></div>
+        <label class="pin-filter"><input id="pinned-only" type="checkbox"> 只看置顶</label>
+        <div id="note-list" class="note-list" aria-label="笔记列表"></div>
+        <div class="backup-actions"><button id="export-json" type="button" class="secondary">备份笔记</button><button id="import-json" type="button" class="secondary">导入备份</button><input id="import-file" type="file" accept=".json,application/json" hidden></div>
+        <p class="backup-hint muted">清理浏览器会移除本地笔记，请定期备份。</p>
+      </aside>
+      <section class="editor-card card" aria-label="笔记编辑器">
+        <div id="editor-empty" class="editor-empty" hidden><span aria-hidden="true">✎</span><h2>从一张白纸开始</h2><p class="muted">新建笔记，或从左侧选择一篇。</p><button id="empty-create" type="button">写下第一个想法</button></div>
+        <div id="editor-panel">
+          <div class="editor-toolbar"><div class="mode-switch" role="group" aria-label="编辑模式"><button id="mode-edit" class="secondary" type="button" aria-pressed="true">编辑</button><button id="mode-preview" class="secondary" type="button" aria-pressed="false">预览</button></div><div class="row"><button id="pin-note" class="secondary" type="button" aria-pressed="false">置顶</button><button id="export-md" class="secondary" type="button">导出 .md</button><button id="delete-note" class="danger" type="button">删除</button></div></div>
+          <label for="note-title" class="sr-only">笔记标题</label><input id="note-title" class="note-title" type="text" maxlength="120" placeholder="给想法起个名字…" autocomplete="off">
+          <div class="tag-editor"><label for="note-tags">标签</label><input id="note-tags" type="text" placeholder="灵感, 工作, 生活（逗号分隔）" maxlength="400" autocomplete="off"></div>
+          <div id="writing-panel"><label for="note-content" class="sr-only">Markdown 正文</label><textarea id="note-content" maxlength="200000" spellcheck="false" placeholder="在这里自由书写…&#10;&#10;支持 Markdown：# 标题、**粗体**、- 列表"></textarea></div>
+          <article id="preview" class="markdown-preview" hidden aria-label="Markdown 预览"></article>
+          <footer class="editor-footer"><span id="word-count">0 字 / 词</span><span id="updated-at"></span><span id="save-state">已保存</span></footer>
+        </div>
+      </section>
+    </section>
+    <footer class="page-footer muted"><span>纸间 · 给日常一点留白</span><span>Ctrl / ⌘ + S 保存 · 最多 1,000 篇</span></footer>
+    <p id="status" class="status-toast" role="status" aria-live="polite" hidden></p>
+  </main>
+</body>
+</html>
