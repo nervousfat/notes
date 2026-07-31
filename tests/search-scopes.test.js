@@ -13,3 +13,12 @@ test('searchNotes requires every token to match somewhere', () => {
   assert.deepEqual(core.searchNotes(notes, '公园').map(item => item.id), ['a', 'b']);
   assert.deepEqual(core.searchNotes(notes, '公园 周记').map(item => item.id), ['a']);
 });
+test('searchNotes narrows by tag and pinned filters', () => {
+  const notes = [
+    note({ id: 'a', tags: ['生活'], pinned: true }),
+    note({ id: 'b', tags: ['生活'] }),
+    note({ id: 'c', tags: ['工作'] })
+  ];
+  assert.deepEqual(core.searchNotes(notes, '', { tag: '生活' }).map(item => item.id), ['a', 'b']);
+  assert.deepEqual(core.searchNotes(notes, '', { pinnedOnly: true }).map(item => item.id), ['a']);
+});
