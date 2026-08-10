@@ -10,3 +10,10 @@ test('mergeNotes keeps the newest revision per identifier', () => {
   const merged = core.mergeNotes(existing, incoming);
   assert.equal(merged.find(item => item.id === 'a').content, '新');
 });
+test('mergeNotes unions identifiers and honors size limits', () => {
+  const existing = [note({ id: 'a' })];
+  const incoming = [note({ id: 'b' })];
+  assert.deepEqual(core.mergeNotes(existing, incoming).map(item => item.id).sort(), ['a', 'b']);
+  const crowd = Array.from({ length: 1001 }, (_, index) => note({ id: 'x' + index }));
+  assert.throws(() => core.mergeNotes(crowd, []), /合并后笔记数量超过 1000/);
+});
