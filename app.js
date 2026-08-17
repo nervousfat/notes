@@ -89,3 +89,57 @@ function renderStats() {
   if (tags.includes(selectedTag)) $('tag-filter').value = selectedTag;
 }
 
+// phase: editor state and autosave
+function renderEditorMeta() {
+  const note = currentNote();
+  if (!note) return;
+  const counts = core.countWords(note.content);
+  $('word-count').textContent = counts.words + ' 字 / 词 · ' + counts.characters + ' 字符';
+  $('updated-at').textContent = '更新于 ' + new Date(note.updatedAt).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  $('pin-note').textContent = note.pinned ? '取消置顶' : '置顶';
+  $('pin-note').setAttribute('aria-pressed', String(note.pinned));
+  if (previewMode) $('preview').innerHTML = core.renderMarkdown(note.content) || '<p class="muted">还没有正文，切换到编辑开始书写。</p>';
+}
+function setMode(value) {
+  previewMode = value;
+  $('mode-edit').setAttribute('aria-pressed', String(!value));
+  $('mode-preview').setAttribute('aria-pressed', String(value));
+  $('writing-panel').hidden = value;
+  $('preview').hidden = !value;
+  renderEditorMeta();
+}
+function renderEditor() {
+  const note = currentNote();
+  $('editor-empty').hidden = Boolean(note);
+  $('editor-panel').hidden = !note;
+  if (!note) return;
+  $('note-title').value = note.title;
+  $('note-content').value = note.content;
+  $('note-tags').value = note.tags.join(', ');
+  setMode(previewMode);
+}
+function captureEdit(field, value) {
+  const note = currentNote();
+  if (!note) return;
+  const next = core.updateNote(note, { [field]: value });
+  notes = notes.map((item) => item.id === note.id ? next : item);
+  renderStats();
+  renderList();
+  renderEditorMeta();
+  scheduleSave();
+}
+function createNewNote() {
+  if (notes.length >= 1000) { announce('笔记数量已达 1,000 篇，请先备份并整理。'); return; }
+  persist();
+  const note = core.createNote();
+  notes.unshift(note);
+  selectedId = note.id;
+  $('search').value = '';
+  $('tag-filter').value = '';
+  $('pinned-only').checked = false;
+  previewMode = false;
+  renderStats(); renderList(); renderEditor(); persist();
+  $('note-title').focus();
+  $('note-title').select();
+}
+
