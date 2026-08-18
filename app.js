@@ -143,3 +143,37 @@ function createNewNote() {
   $('note-title').select();
 }
 
+// phase: editing actions and accessible controls
+$('new-note').addEventListener('click', createNewNote);
+$('empty-create').addEventListener('click', createNewNote);
+$('note-title').addEventListener('input', (event) => captureEdit('title', event.target.value));
+$('note-content').addEventListener('input', (event) => captureEdit('content', event.target.value));
+$('note-tags').addEventListener('input', (event) => captureEdit('tags', event.target.value));
+$('search').addEventListener('input', renderList);
+$('tag-filter').addEventListener('change', renderList);
+$('sort-order').addEventListener('change', renderList);
+$('pinned-only').addEventListener('change', renderList);
+$('mode-edit').addEventListener('click', () => setMode(false));
+$('mode-preview').addEventListener('click', () => setMode(true));
+$('pin-note').addEventListener('click', () => {
+  const note = currentNote();
+  if (!note) return;
+  notes = notes.map((item) => item.id === note.id ? core.togglePin(item) : item);
+  renderList(); renderEditorMeta(); persist();
+});
+$('delete-note').addEventListener('click', () => {
+  const note = currentNote();
+  if (!note || !confirm('删除「' + note.title + '」？此操作无法撤销，建议先导出备份。')) return;
+  notes = core.removeNote(notes, note.id);
+  selectedId = core.sortNotes(notes)[0]?.id || null;
+  renderStats(); renderList(); renderEditor(); persist();
+  announce('笔记已删除');
+});
+window.addEventListener('keydown', (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+    event.preventDefault();
+    if (persist()) announce('笔记已保存到本机');
+  }
+});
+window.addEventListener('pagehide', () => { persist(); });
+
