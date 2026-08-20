@@ -16,3 +16,6 @@ test('notebookStats aggregates notes tags and volume', () => {
   assert.equal(stats.words, 3);
   assert.equal(stats.characters, 7);
 });
+test('notebookStats tolerates empty notebooks', () => {
+  assert.deepEqual(core.notebookStats([]), { notes: 0, pinned: 0, tags: 0, words: 0, characters: 0 });
+});
