@@ -177,3 +177,46 @@ window.addEventListener('keydown', (event) => {
 });
 window.addEventListener('pagehide', () => { persist(); });
 
+// phase: validated backup import and downloads
+function download(filename, content, type = 'text/plain;charset=utf-8') {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+$('export-md').addEventListener('click', () => {
+  const note = currentNote();
+  if (!note) return;
+  const exported = core.exportMarkdown(note);
+  download(exported.filename, exported.content, 'text/markdown;charset=utf-8');
+  announce('Markdown 导出已准备');
+});
+$('export-json').addEventListener('click', () => {
+  try {
+    download('paperspace-' + new Date().toISOString().slice(0, 10) + '.json', core.serializeNotebook(notes), 'application/json');
+    announce('全部笔记备份已准备');
+  } catch (error) { announce('导出失败：' + error.message); }
+});
+$('import-json').addEventListener('click', () => $('import-file').click());
+$('import-file').addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    if (file.size > 5000000) throw new Error('请选择小于 5 MB 的备份文件');
+    const incoming = core.parseNotebook(await file.text());
+    const merged = core.mergeNotes(notes, incoming);
+    core.serializeNotebook(merged);
+    notes = merged;
+    selectedId = selectedId && notes.some((note) => note.id === selectedId) ? selectedId : notes[0]?.id || null;
+    renderStats(); renderList(); renderEditor();
+    const saved = persist();
+    announce('已合并 ' + incoming.length + ' 篇笔记；同编号保留较新版本。' + (saved ? '' : '请导出备份，当前尚未保存到本机。'));
+  } catch (error) { announce('导入失败：' + error.message); }
+  finally { event.target.value = ''; }
+});
+
