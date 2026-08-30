@@ -220,3 +220,33 @@ $('import-file').addEventListener('change', async (event) => {
   finally { event.target.value = ''; }
 });
 
+// phase: corrupted-storage recovery and initial render
+function showRecovery(message) {
+  $('recovery-panel').hidden = false;
+  $('recovery-message').textContent = message + '。自动保存已暂停，现有存储不会被覆盖。可以下载原始数据后重新启用保存。';
+  $('download-recovery').disabled = recoveryRaw === null || recoveryRaw === undefined;
+  $('save-state').textContent = '仅在内存中，请先备份';
+}
+$('download-recovery').addEventListener('click', () => {
+  if (recoveryRaw !== null && recoveryRaw !== undefined) download('paperspace-recovery.txt', recoveryRaw);
+});
+$('reset-storage').addEventListener('click', () => {
+  if (!confirm('重新启用会用当前页面中的笔记替换浏览器内的旧数据。请先下载需要保留的原始数据。继续？')) return;
+  saveBlocked = false;
+  if (persist()) { $('recovery-panel').hidden = true; recoveryRaw = null; announce('本地保存已重新启用'); }
+  else { saveBlocked = true; }
+});
+window.addEventListener('storage', (event) => {
+  if (event.key !== STORAGE_KEY) return;
+  clearTimeout(saveTimer);
+  saveBlocked = true;
+  recoveryRaw = event.newValue;
+  showRecovery('其他窗口更新了笔记；当前页面保留你正在编辑的内容');
+});
+renderStats();
+renderList();
+renderEditor();
+if (loaded.error) showRecovery('无法读取本地笔记：' + loaded.error);
+else if (loaded.fresh) persist();
+else $('save-state').textContent = '已保存到本机';
+
