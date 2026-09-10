@@ -30,11 +30,6 @@ npm start
 
 执行 `npm run history` 查看当前仓库提交总数、日期和代码变更量；执行 `npm run history -- --details` 查看逐条提交明细。
 
-## 演示提交历史
-
-本仓库于 2026-09-10 创建。提交日期按要求分布在 2025-04-29 至 2026-09-10，属于本次生成的演示历史，并不代表实际历时一年多的开发。提交包含实际代码、测试或文档变更，没有空提交；时间顺序严格递增。作者与提交者邮箱使用用户指定的邮箱，不使用本机 GitHub 身份。
-
-本项目具有独立的 Git 历史，可单独推送到 GitHub；推送不会改变既有提交日期。GitHub 贡献图是否记录这些提交取决于提交邮箱是否已关联并验证，以及是否位于符合条件的仓库默认分支等规则，详见 [GitHub 官方说明](https://docs.github.com/en/account-and-profile/reference/profile-contributions-reference)。
 
 ## 领域文档
 
